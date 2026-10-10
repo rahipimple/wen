@@ -147,10 +147,54 @@ public class WENServer {
                 try (Statement stmt = conn.createStatement()) {
                     stmt.execute(createTableSql);
                 }
+                seedDefaultUsers(conn);
                 System.out.println("[DATABASE] SQLite Connection Verified & Table 'users' Ready: wen_database.db");
             }
         } catch (SQLException e) {
             System.err.println("[DATABASE NOTICE] SQLite DB initialization info: " + e.getMessage());
+        }
+    }
+
+    private static void seedDefaultUsers(Connection conn) {
+        try {
+            String checkCountSql = "SELECT COUNT(*) FROM users";
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(checkCountSql)) {
+                if (rs.next() && rs.getInt(1) == 0) {
+                    String insertSql = "INSERT INTO users (name, email, role, business_name, login_time) VALUES (?, ?, ?, ?, ?)";
+                    try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+                        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                        // Seed User 1: Rahi
+                        pstmt.setString(1, "rahi");
+                        pstmt.setString(2, "rahi@wen.network");
+                        pstmt.setString(3, "Early-Stage Startup Founder");
+                        pstmt.setString(4, "Rahi Innovations");
+                        pstmt.setString(5, time);
+                        pstmt.executeUpdate();
+
+                        // Seed User 2: Ananya Deshmukh
+                        pstmt.setString(1, "Ananya Deshmukh");
+                        pstmt.setString(2, "ananya@yourventure.com");
+                        pstmt.setString(3, "Early-Stage Startup Founder");
+                        pstmt.setString(4, "EcoStyle Studios");
+                        pstmt.setString(5, time);
+                        pstmt.executeUpdate();
+
+                        // Seed User 3: Priya Sharma
+                        pstmt.setString(1, "Priya Sharma");
+                        pstmt.setString(2, "priya@sharma-tech.com");
+                        pstmt.setString(3, "Mentor & Advisor");
+                        pstmt.setString(4, "Sharma Tech Ventures");
+                        pstmt.setString(5, time);
+                        pstmt.executeUpdate();
+
+                        System.out.println("[DATABASE SEED] Default site users automatically seeded into SQLite database (wen_database.db)!");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[DATABASE SEED NOTICE] " + e.getMessage());
         }
     }
 
