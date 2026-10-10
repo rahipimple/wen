@@ -8,13 +8,13 @@ Write-Host "==================================================================" 
 $currentDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $currentDir
 
-Write-Host "Compiling WENServer.java..." -ForegroundColor Cyan
-javac WENServer.java
+Write-Host "Compiling WENServer.java with SQLite Database support..." -ForegroundColor Cyan
+javac -cp ".;sqlite-jdbc.jar" WENServer.java
 
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "Starting WEN Java Server at http://localhost:8080/ ..." -ForegroundColor Green
+    Write-Host "Starting WEN Java Server with SQLite Database (wen_database.db)..." -ForegroundColor Green
     Start-Process "http://localhost:8080/"
-    java WENServer 8080
+    java -cp ".;sqlite-jdbc.jar" WENServer 8080
 } else {
     Write-Host "Java compiler (javac) not found or compilation failed. Check JDK installation." -ForegroundColor Red
 }

@@ -860,10 +860,29 @@ function getAuthModalHTML(defaultMode = 'signup') {
 function handleAuthSubmit(e) {
   e.preventDefault();
   const form = e.target;
-  window.APP_STATE.currentUser.name = form.name.value;
-  window.APP_STATE.currentUser.email = form.email.value;
-  window.APP_STATE.currentUser.role = form.role.value;
-  window.APP_STATE.currentUser.businessName = form.businessName.value;
+  const loginData = {
+    name: form.name.value,
+    email: form.email.value,
+    role: form.role.value,
+    businessName: form.businessName.value
+  };
+
+  window.APP_STATE.currentUser.name = loginData.name;
+  window.APP_STATE.currentUser.email = loginData.email;
+  window.APP_STATE.currentUser.role = loginData.role;
+  window.APP_STATE.currentUser.businessName = loginData.businessName;
+
+  // Send Login details to Java Backend API & SQLite Database
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(loginData)
+  }).then(res => res.json())
+    .then(data => {
+      console.log('[JAVA DB RESPONSE]', data);
+    }).catch(err => {
+      console.warn('Java DB sync note:', err);
+    });
 
   closeAllModals();
   showToast(`Welcome back, ${form.name.value}! Logged in as ${form.role.value}.`, 'success');
