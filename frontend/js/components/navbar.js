@@ -94,8 +94,8 @@ function renderNavbar(currentRoute, state) {
                           <i data-lucide="flask-conical" class="w-4 h-4"></i>
                         </div>
                         <div>
-                          <p class="font-bold text-slate-900">10 Experiments</p>
-                          <p class="text-[10px] text-slate-500 font-normal">Java & Web Lab Work</p>
+                          <p class="font-bold text-slate-900">Experiments</p>
+                          <p class="text-[10px] text-slate-500 font-normal">Upload & View Lab Submissions</p>
                         </div>
                       </button>
 
@@ -107,8 +107,8 @@ function renderNavbar(currentRoute, state) {
                           <i data-lucide="file-text" class="w-4 h-4"></i>
                         </div>
                         <div>
-                          <p class="font-bold text-slate-900">8 Assignments</p>
-                          <p class="text-[10px] text-slate-500 font-normal">Practical Submissions</p>
+                          <p class="font-bold text-slate-900">Assignments</p>
+                          <p class="text-[10px] text-slate-500 font-normal">Upload & View Practical Work</p>
                         </div>
                       </button>
                     </div>
@@ -201,13 +201,13 @@ function renderNavbar(currentRoute, state) {
             onclick="navigate('courses'); switchCoursesTab('experiments'); toggleMobileMenu();"
             class="text-left px-3 py-2.5 rounded-xl text-xs font-semibold ${currentRoute.startsWith('courses') ? 'bg-purple-100 text-purple-800' : 'text-slate-700 hover:bg-slate-100'}"
           >
-            🔬 10 Experiments
+            🔬 Experiments
           </button>
           <button 
             onclick="navigate('courses'); switchCoursesTab('assignments'); toggleMobileMenu();"
             class="text-left px-3 py-2.5 rounded-xl text-xs font-semibold ${currentRoute.startsWith('courses') ? 'bg-purple-100 text-purple-800' : 'text-slate-700 hover:bg-slate-100'}"
           >
-            📝 8 Assignments
+            📝 Assignments
           </button>
           <button 
             onclick="navigate('mentors'); toggleMobileMenu();"
