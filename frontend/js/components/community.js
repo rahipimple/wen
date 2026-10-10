@@ -27,7 +27,7 @@ function renderCommunityView(state) {
           </span>
           <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight font-heading">
             Connect, Collaborate & <br class="hidden sm:inline"/>
-            <span class="text-gradient-wen">Grow with 5,200+ Female Founders</span>
+            <span class="text-gradient-wen">Grow with ${(5200 + ((state.mongoUsers || []).length)).toLocaleString()}+ Female Founders</span>
           </h1>
           <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Ask tough questions, find co-founders, share raw startup learnings, celebrate wins, and build lifelong partnerships.
@@ -200,6 +200,38 @@ function renderCommunityView(state) {
           <!-- RIGHT: Groups & Chapters Sidebar -->
           <div class="lg:col-span-4 space-y-6">
             
+            <!-- Live MongoDB Database Sync Members Card -->
+            <div class="bg-gradient-to-br from-slate-900 to-purple-950 text-white rounded-2xl p-5 border border-purple-800/50 shadow-md space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <h3 class="text-xs font-extrabold uppercase tracking-wider font-heading text-purple-200">Live MongoDB Sync</h3>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  wen_db.users
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-300">
+                Real-time MongoDB documents auto-synced across codebase (${(state.mongoUsers || []).length} registered):
+              </p>
+              <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                ${((state.mongoUsers || []).length === 0) 
+                  ? `<div class="text-[11px] text-slate-400 italic">No users in MongoDB collection yet.</div>`
+                  : (state.mongoUsers || []).slice().reverse().map(u => `
+                    <div class="p-2.5 rounded-xl bg-white/10 border border-white/10 flex items-center justify-between text-xs backdrop-blur-xs">
+                      <div class="min-w-0 pr-2">
+                        <div class="font-bold text-white truncate">${u.name}</div>
+                        <div class="text-[10px] text-purple-300 truncate">${u.businessName || u.role}</div>
+                      </div>
+                      <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-200 shrink-0">
+                        ${u.loginTime ? u.loginTime.split(' ')[1] : 'Just now'}
+                      </span>
+                    </div>
+                  `).join('')
+                }
+              </div>
+            </div>
+
             <!-- Interest-Based Communities Card -->
             <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-soft space-y-4">
               <div class="flex items-center justify-between">

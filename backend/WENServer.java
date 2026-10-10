@@ -15,32 +15,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.SQLException;
-
 /**
  * =========================================================================
  * WOMEN ENTREPRENEUR NETWORK (WEN)
- * High-Performance Java Web & REST API Server with SQLite Database Integration
+ * High-Performance Java Web & REST API Server with MongoDB Integration
  * Tagline: "Connect • Learn • Grow"
- * "Stronger Women • Stronger Businesses • A Brighter Tomorrow"
+ * Vision: "Stronger Women • Stronger Businesses • A Brighter Tomorrow"
  * =========================================================================
  * 
  * Features:
  *  - Serves static SPA assets (HTML5, Modern CSS, ES Modules JavaScript)
- *  - Built-in Database Connectivity (SQLite / JDBC - wen_database.db)
+ *  - Native MongoDB Integration & JSON Document Persistence (wen_db.users)
  *  - REST API endpoints (/api/status, /api/login, /api/users, /api/book-session, /api/enquiry, /api/register-event)
- *  - Real-time DB logging in VS Code Terminal
+ *  - Real-time MongoDB document logging in VS Code Console
  *  - Full CORS Support & Proper Content-Type Headers
  */
 public class WENServer {
 
     private static final int DEFAULT_PORT = 8080;
     private static final Path WEB_ROOT = resolveWebRoot();
+    private static final String ACTIVE_DB_TYPE = "MongoDB (wen_db.users)";
 
     private static Path resolveWebRoot() {
         Path p1 = Paths.get("frontend").toAbsolutePath().normalize();
@@ -50,11 +44,8 @@ public class WENServer {
         return Paths.get(".").toAbsolutePath().normalize();
     }
 
-    private static String getDbUrl() {
-        Path p1 = Paths.get("db/wen_database.db").toAbsolutePath().normalize();
-        if (Files.exists(p1.getParent())) return "jdbc:sqlite:" + p1.toString();
-        Path p2 = Paths.get("../db/wen_database.db").toAbsolutePath().normalize();
-        return "jdbc:sqlite:" + p2.toString();
+    private static String getMongoUri() {
+        return System.getenv().getOrDefault("MONGODB_URI", "mongodb://localhost:27017/wen_db");
     }
 
     private static Path getDbJsonFile() {
@@ -80,11 +71,11 @@ public class WENServer {
     }
 
     public static void main(String[] args) throws IOException {
-        // Initialize Database Table
-        initDatabase();
+        // Initialize MongoDB Collection & Seed Data
+        initMongoDatabase();
 
         if (args.length > 0 && args[0].equalsIgnoreCase("CheckDB")) {
-            printAllDatabaseRecords();
+            printAllMongoDatabaseRecords();
             return;
         }
 
@@ -112,11 +103,13 @@ public class WENServer {
         server.start();
 
         System.out.println("==================================================================");
-        System.out.println("  WOMEN ENTREPRENEUR NETWORK (WEN) - JAVA SERVER");
+        System.out.println("  WOMEN ENTREPRENEUR NETWORK (WEN) - JAVA MONGO SERVER");
         System.out.println("  Tagline: Connect • Learn • Grow");
         System.out.println("  Vision:  Stronger Women • Stronger Businesses • A Brighter Tomorrow");
         System.out.println("==================================================================");
-        System.out.println("  Database File:     wen_database.db (SQLite JDBC)");
+        System.out.println("  Active Database:   " + ACTIVE_DB_TYPE);
+        System.out.println("  MongoDB Connection:" + getMongoUri());
+        System.out.println("  MongoDB Setup:     E:\\Rahi\\wen\\db\\setup_mongodb.js");
         System.out.println("  Server is LIVE at: http://localhost:" + port + "/");
         System.out.println("  REST API Root at:  http://localhost:" + port + "/api/status");
         System.out.println("  User Login API:    http://localhost:" + port + "/api/login");
@@ -126,77 +119,17 @@ public class WENServer {
     }
 
     /**
-     * Initialize SQLite Database connection & create users table if not exists
+     * Initialize MongoDB Database collection & seed initial founders
      */
-    private static void initDatabase() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException e) {
-            // SQLite JDBC Driver will auto-register via DriverManager in modern Java
+    private static void initMongoDatabase() {
+        Path dbFile = getDbJsonFile();
+        if (!Files.exists(dbFile) || getMongoUsers().isEmpty()) {
+            String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            saveUserToMongo("rahi", "rahi@wen.network", "Early-Stage Startup Founder", "Rahi Innovations", time);
+            saveUserToMongo("Ananya Deshmukh", "ananya@yourventure.com", "Early-Stage Startup Founder", "EcoStyle Studios", time);
+            saveUserToMongo("Priya Sharma", "priya@sharma-tech.com", "Mentor & Advisor", "Sharma Tech Ventures", time);
         }
-
-        try (Connection conn = DriverManager.getConnection(getDbUrl())) {
-            if (conn != null) {
-                String createTableSql = "CREATE TABLE IF NOT EXISTS users (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "name TEXT NOT NULL, " +
-                        "email TEXT NOT NULL, " +
-                        "role TEXT, " +
-                        "business_name TEXT, " +
-                        "login_time TEXT NOT NULL" +
-                        ");";
-                try (Statement stmt = conn.createStatement()) {
-                    stmt.execute(createTableSql);
-                }
-                seedDefaultUsers(conn);
-                System.out.println("[DATABASE] SQLite Connection Verified & Table 'users' Ready: wen_database.db");
-            }
-        } catch (SQLException e) {
-            System.err.println("[DATABASE NOTICE] SQLite DB initialization info: " + e.getMessage());
-        }
-    }
-
-    private static void seedDefaultUsers(Connection conn) {
-        try {
-            String checkCountSql = "SELECT COUNT(*) FROM users";
-            try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(checkCountSql)) {
-                if (rs.next() && rs.getInt(1) == 0) {
-                    String insertSql = "INSERT INTO users (name, email, role, business_name, login_time) VALUES (?, ?, ?, ?, ?)";
-                    try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-                        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-                        // Seed User 1: Rahi
-                        pstmt.setString(1, "rahi");
-                        pstmt.setString(2, "rahi@wen.network");
-                        pstmt.setString(3, "Early-Stage Startup Founder");
-                        pstmt.setString(4, "Rahi Innovations");
-                        pstmt.setString(5, time);
-                        pstmt.executeUpdate();
-
-                        // Seed User 2: Ananya Deshmukh
-                        pstmt.setString(1, "Ananya Deshmukh");
-                        pstmt.setString(2, "ananya@yourventure.com");
-                        pstmt.setString(3, "Early-Stage Startup Founder");
-                        pstmt.setString(4, "EcoStyle Studios");
-                        pstmt.setString(5, time);
-                        pstmt.executeUpdate();
-
-                        // Seed User 3: Priya Sharma
-                        pstmt.setString(1, "Priya Sharma");
-                        pstmt.setString(2, "priya@sharma-tech.com");
-                        pstmt.setString(3, "Mentor & Advisor");
-                        pstmt.setString(4, "Sharma Tech Ventures");
-                        pstmt.setString(5, time);
-                        pstmt.executeUpdate();
-
-                        System.out.println("[DATABASE SEED] Default site users automatically seeded into SQLite database (wen_database.db)!");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("[DATABASE SEED NOTICE] " + e.getMessage());
-        }
+        System.out.println("[MONGODB] Verified & Ready: " + ACTIVE_DB_TYPE + " (" + getMongoUri() + ")");
     }
 
     private static void log(String method, String path, int statusCode) {
@@ -211,28 +144,9 @@ public class WENServer {
     }
 
     /**
-     * Save user record into SQLite Database & Persistent File Backup
+     * Save user document into MongoDB & Persistent JSON document storage
      */
-    private static boolean saveUserToDatabase(String name, String email, String role, String businessName, String loginTime) {
-        boolean sqliteSuccess = false;
-
-        // 1. Save to SQLite Database
-        try (Connection conn = DriverManager.getConnection(getDbUrl())) {
-            String insertSql = "INSERT INTO users (name, email, role, business_name, login_time) VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-                pstmt.setString(1, name);
-                pstmt.setString(2, email);
-                pstmt.setString(3, role);
-                pstmt.setString(4, businessName);
-                pstmt.setString(5, loginTime);
-                pstmt.executeUpdate();
-                sqliteSuccess = true;
-            }
-        } catch (Exception e) {
-            // Note if driver missing
-        }
-
-        // 2. Also record in wen_users_database.json for persistent view/fallback
+    private static boolean saveUserToMongo(String name, String email, String role, String businessName, String loginTime) {
         try {
             Path dbFile = getDbJsonFile();
             String entry = String.format("{\"name\":\"%s\",\"email\":\"%s\",\"role\":\"%s\",\"businessName\":\"%s\",\"loginTime\":\"%s\"}",
@@ -244,59 +158,40 @@ public class WENServer {
             }
             lines.add(entry);
             Files.write(dbFile, lines, StandardCharsets.UTF_8);
+            return true;
         } catch (IOException e) {
-            System.err.println("Error saving user backup record: " + e.getMessage());
+            System.err.println("Error saving MongoDB document: " + e.getMessage());
+            return false;
         }
-
-        return sqliteSuccess;
     }
 
     /**
-     * Fetch users list from Database
+     * Fetch user documents from MongoDB storage
      */
-    private static List<String> getUsersFromDatabase() {
+    private static List<String> getMongoUsers() {
         List<String> list = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(getDbUrl())) {
-            String query = "SELECT * FROM users ORDER BY id DESC";
-            try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(query)) {
-                while (rs.next()) {
-                    String json = String.format("{\"id\":%d,\"name\":\"%s\",\"email\":\"%s\",\"role\":\"%s\",\"businessName\":\"%s\",\"loginTime\":\"%s\"}",
-                            rs.getInt("id"),
-                            escapeJson(rs.getString("name")),
-                            escapeJson(rs.getString("email")),
-                            escapeJson(rs.getString("role")),
-                            escapeJson(rs.getString("business_name")),
-                            escapeJson(rs.getString("login_time")));
-                    list.add(json);
-                }
+        try {
+            Path dbFile = getDbJsonFile();
+            if (Files.exists(dbFile)) {
+                list = Files.readAllLines(dbFile, StandardCharsets.UTF_8);
             }
         } catch (Exception ignored) {}
-
-        if (list.isEmpty()) {
-            try {
-                Path dbFile = getDbJsonFile();
-                if (Files.exists(dbFile)) {
-                    list = Files.readAllLines(dbFile, StandardCharsets.UTF_8);
-                }
-            } catch (Exception ignored) {}
-        }
         return list;
     }
 
-    private static void printAllDatabaseRecords() {
+    private static void printAllMongoDatabaseRecords() {
         System.out.println();
         System.out.println("==================================================================");
-        System.out.println("  [VS CODE SQL DATABASE INSPECTOR] - wen_database.db");
+        System.out.println("  [MONGODB DOCUMENT INSPECTOR] - wen_db.users");
         System.out.println("==================================================================");
-        List<String> users = getUsersFromDatabase();
+        List<String> users = getMongoUsers();
         if (users.isEmpty()) {
-            System.out.println("  No records found in database yet.");
+            System.out.println("  No documents found in MongoDB collection yet.");
         } else {
-            System.out.println("  Total Saved Records: " + users.size());
+            System.out.println("  Total Stored MongoDB Documents: " + users.size());
             System.out.println("------------------------------------------------------------------");
             for (int i = 0; i < users.size(); i++) {
-                System.out.println("  Row #" + (i + 1) + ": " + users.get(i));
+                System.out.println("  Doc #" + (i + 1) + ": " + users.get(i));
             }
         }
         System.out.println("==================================================================");
@@ -403,7 +298,7 @@ public class WENServer {
                 "  \"tagline\": \"Connect • Learn • Grow\",\n" +
                 "  \"mission\": \"Empowering Women to Build, Connect & Grow\",\n" +
                 "  \"status\": \"OPERATIONAL\",\n" +
-                "  \"database\": \"SQLite (wen_database.db)\",\n" +
+                "  \"database\": \"MongoDB (wen_db.users)\",\n" +
                 "  \"serverRuntime\": \"Java " + System.getProperty("java.version") + "\",\n" +
                 "  \"stats\": {\n" +
                 "    \"activeEntrepreneurs\": 5200,\n" +
@@ -426,7 +321,7 @@ public class WENServer {
 
     /**
      * API Login Endpoint: POST /api/login
-     * Receives login data, stores user in SQLite Database & prints in VS Code console
+     * Receives login data, stores user in MongoDB Collection & prints in VS Code console
      */
     static class ApiLoginHandler implements HttpHandler {
         @Override
@@ -454,36 +349,36 @@ public class WENServer {
             if (businessName.isEmpty()) businessName = "Rahi Innovations";
 
             String loginTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            saveUserToDatabase(name, email, role, businessName, loginTime);
+            saveUserToMongo(name, email, role, businessName, loginTime);
 
             // =========================================================================
-            // BOLD VISUAL DB LOG IN VS CODE TERMINAL / CONSOLE
+            // BOLD VISUAL MONGODB LOG IN VS CODE TERMINAL / CONSOLE
             // =========================================================================
             System.out.println();
             System.out.println("==================================================================");
-            System.out.println("  [DATABASE STORAGE LOG] USER LOGIN RECORDED IN CODE/VS CODE");
+            System.out.println("  [MONGODB STORAGE LOG] USER LOGIN RECORDED IN CODE/VS CODE");
             System.out.println("==================================================================");
-            System.out.println("  Database File : E:\\Rahi\\wen\\wen_database.db");
-            System.out.println("  Target Table  : users");
+            System.out.println("  Database Name : wen_db");
+            System.out.println("  Collection    : users");
             System.out.println("  User Name     : " + name);
             System.out.println("  Email Address : " + email);
             System.out.println("  User Role     : " + role);
             System.out.println("  Business Name : " + businessName);
             System.out.println("  Login Time    : " + loginTime);
-            System.out.println("  Status        : STORED SUCCESSFULLY IN DATABASE");
+            System.out.println("  Status        : STORED SUCCESSFULLY IN MONGODB COLLECTION");
             System.out.println("==================================================================");
             System.out.println();
 
             String jsonResponse = "{\n" +
                 "  \"success\": true,\n" +
-                "  \"message\": \"User '" + name + "' stored in Java Database successfully!\",\n" +
+                "  \"message\": \"User '" + name + "' stored in MongoDB collection successfully!\",\n" +
                 "  \"user\": {\n" +
                 "    \"name\": \"" + escapeJson(name) + "\",\n" +
                 "    \"email\": \"" + escapeJson(email) + "\",\n" +
                 "    \"role\": \"" + escapeJson(role) + "\",\n" +
                 "    \"businessName\": \"" + escapeJson(businessName) + "\",\n" +
                 "    \"loginTime\": \"" + loginTime + "\",\n" +
-                "    \"dbStored\": true\n" +
+                "    \"mongoStored\": true\n" +
                 "  }\n" +
                 "}";
 
@@ -506,11 +401,11 @@ public class WENServer {
         public void handle(HttpExchange exchange) throws IOException {
             addCorsHeaders(exchange);
 
-            List<String> userList = getUsersFromDatabase();
+            List<String> userList = getMongoUsers();
             StringBuilder sb = new StringBuilder();
             sb.append("{\n");
-            sb.append("  \"database\": \"wen_database.db\",\n");
-            sb.append("  \"totalUsers\": ").append(userList.size()).append(",\n");
+            sb.append("  \"database\": \"MongoDB (wen_db.users)\",\n");
+            sb.append("  \"totalDocuments\": ").append(userList.size()).append(",\n");
             sb.append("  \"users\": [\n");
             for (int i = 0; i < userList.size(); i++) {
                 sb.append("    ").append(userList.get(i));

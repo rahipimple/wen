@@ -896,16 +896,19 @@ function handleAuthSubmit(e) {
   window.APP_STATE.currentUser.role = loginData.role;
   window.APP_STATE.currentUser.businessName = loginData.businessName;
 
-  // Send Login details to Java Backend API & SQLite Database
+  // Send Login details to Java Backend API & MongoDB Collection (wen_db.users)
   fetch('/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(loginData)
   }).then(res => res.json())
     .then(data => {
-      console.log('[JAVA DB RESPONSE]', data);
+      console.log('[MONGODB RESPONSE]', data);
+      if (typeof window.syncMongoUsers === 'function') {
+        window.syncMongoUsers();
+      }
     }).catch(err => {
-      console.warn('Java DB sync note:', err);
+      console.warn('MongoDB sync note:', err);
     });
 
   closeAllModals();

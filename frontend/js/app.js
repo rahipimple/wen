@@ -16,6 +16,7 @@ function initAppState() {
         customProducts: parsed.customProducts || [],
         customCommunityPosts: parsed.customCommunityPosts || [],
         communityGroups: parsed.communityGroups || WEN_DATA.communityGroups,
+        mongoUsers: parsed.mongoUsers || [],
         mentorCategoryFilter: 'All',
         mentorSearchQuery: '',
         fundingCategoryFilter: 'All',
@@ -40,6 +41,7 @@ function initAppState() {
     customProducts: [],
     customCommunityPosts: [],
     communityGroups: JSON.parse(JSON.stringify(WEN_DATA.communityGroups)),
+    mongoUsers: [],
     mentorCategoryFilter: 'All',
     mentorSearchQuery: '',
     fundingCategoryFilter: 'All',
@@ -234,6 +236,31 @@ window.addEventListener('hashchange', () => {
   }
 });
 
+// Real-Time MongoDB Automated Live Sync Controller
+async function syncMongoUsers() {
+  try {
+    const res = await fetch('/api/users');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && Array.isArray(data.users)) {
+      const prevCount = window.APP_STATE.mongoUsers ? window.APP_STATE.mongoUsers.length : 0;
+      window.APP_STATE.mongoUsers = data.users;
+      
+      // If a new user joined during live session, trigger automated notification & view refresh
+      if (prevCount > 0 && data.users.length > prevCount) {
+        const latestUser = data.users[data.users.length - 1];
+        showToast(`🎉 New founder joined MongoDB: ${latestUser.name} (${latestUser.businessName || latestUser.role})`, 'success');
+        if (['community', 'dashboard', 'home'].includes(window.APP_STATE.currentRoute)) {
+          renderView(window.APP_STATE.currentRoute);
+        }
+      }
+    }
+  } catch (err) {
+    // Silent fail if dev server is re-building
+  }
+}
+window.syncMongoUsers = syncMongoUsers;
+
 // App Startup on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
   // Inject modal shell
@@ -244,4 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial Route
   const initialHash = window.location.hash.replace('#', '') || 'home';
   navigate(initialHash);
+
+  // Start Real-time Automated MongoDB Live Sync (Polls every 5s)
+  syncMongoUsers();
+  setInterval(syncMongoUsers, 5000);
 });

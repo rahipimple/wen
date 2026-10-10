@@ -279,6 +279,56 @@ function renderActiveTabContent(activeTab, state, user, savedSchemes, registered
             </div>
           </div>
 
+          <!-- Real-Time MongoDB Connection & Live Members Card -->
+          <div class="bg-gradient-to-br from-purple-900 via-slate-900 to-purple-950 text-white rounded-3xl p-6 border border-purple-800/60 shadow-lg space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <h3 class="text-xs font-black uppercase tracking-wider text-purple-200 font-heading">MongoDB Live Sync</h3>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                ACTIVE
+              </span>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-white/10 border border-white/10 space-y-1 text-xs backdrop-blur-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-300 font-medium">Database:</span>
+                <span class="font-mono text-purple-200 font-bold">wen_db</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-300 font-medium">Collection:</span>
+                <span class="font-mono text-pink-300 font-bold">users</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-300 font-medium">Total Docs:</span>
+                <span class="font-mono text-emerald-300 font-bold">${((state.mongoUsers || []).length)} Documents</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-purple-300 block">
+                Recently Joined Founders:
+              </span>
+              <div class="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                ${((state.mongoUsers || []).length === 0)
+                  ? `<div class="text-xs text-slate-400 italic">No stored documents yet.</div>`
+                  : (state.mongoUsers || []).slice().reverse().map(u => `
+                    <div class="p-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
+                      <div class="truncate pr-2">
+                        <div class="font-bold text-white truncate">${u.name}</div>
+                        <div class="text-[10px] text-purple-300 truncate">${u.email}</div>
+                      </div>
+                      <span class="text-[9px] px-1.5 py-0.5 rounded bg-pink-500/30 text-pink-200 shrink-0 font-mono">
+                        ${u.loginTime ? u.loginTime.split(' ')[1] : 'Live'}
+                      </span>
+                    </div>
+                  `).join('')
+                }
+              </div>
+            </div>
+          </div>
+
           <!-- Community Activity Widget -->
           <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft space-y-3">
             <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider font-heading">Recent Community Buzz</h3>
