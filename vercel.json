@@ -16,6 +16,10 @@
       "dest": "/frontend/js/$1"
     },
     {
+      "src": "/pdfs/(.*)",
+      "dest": "/frontend/pdfs/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/index.html"
     }
