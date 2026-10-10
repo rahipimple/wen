@@ -63,6 +63,12 @@ function openModal(modalType, payload = null) {
     case 'upgradeModal':
       html = getUpgradeModalHTML();
       break;
+    case 'experimentModal':
+      html = getExperimentModalHTML(payload);
+      break;
+    case 'assignmentModal':
+      html = getAssignmentModalHTML(payload);
+      break;
     default:
       html = '<div class="p-6">No modal template found.</div>';
   }
@@ -961,4 +967,113 @@ function handleActivatePremium() {
   if (window.APP_STATE.currentRoute === 'pricing' || window.APP_STATE.currentRoute === 'dashboard') {
     renderView(window.APP_STATE.currentRoute);
   }
+}
+
+// ----------------------------------------------------
+// 11. EXPERIMENT DETAILS MODAL
+// ----------------------------------------------------
+function openExperimentModal(expId) {
+  const exp = WEN_COURSES_DATA.experiments.find(e => e.id === expId) || WEN_COURSES_DATA.experiments[0];
+  openModal('experimentModal', exp);
+}
+
+function getExperimentModalHTML(exp) {
+  return `
+    <div class="p-6 overflow-y-auto space-y-4 text-xs">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
+            Experiment ${exp.number} • ${exp.category}
+          </span>
+          <h3 class="text-base font-bold text-slate-900 mt-1">Exp ${exp.number}: ${exp.title}</h3>
+        </div>
+        <button onclick="closeAllModals()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between font-semibold">
+        <span class="text-emerald-700 font-bold flex items-center gap-1">
+          <i data-lucide="check-circle" class="w-4 h-4"></i> Status: ${exp.status}
+        </span>
+        <span class="text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-md font-extrabold">
+          Grade: ${exp.grade}
+        </span>
+      </div>
+
+      <div class="space-y-1.5">
+        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Experiment Description:</h4>
+        <p class="text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-100">${exp.description}</p>
+      </div>
+
+      <div class="space-y-1.5">
+        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Technical Implementation Details:</h4>
+        <p class="text-slate-600 leading-relaxed bg-purple-50/50 p-3 rounded-xl border border-purple-100">${exp.details}</p>
+      </div>
+
+      <div class="space-y-1.5">
+        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Technology Stack:</h4>
+        <div class="flex flex-wrap gap-1.5">
+          ${exp.tags.map(t => `<span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold"># ${t}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center justify-end">
+        <button onclick="closeAllModals()" class="px-5 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-md">
+          Close Window
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ----------------------------------------------------
+// 12. ASSIGNMENT DETAILS MODAL
+// ----------------------------------------------------
+function openAssignmentModal(assignId) {
+  const ass = WEN_COURSES_DATA.assignments.find(a => a.id === assignId) || WEN_COURSES_DATA.assignments[0];
+  openModal('assignmentModal', ass);
+}
+
+function getAssignmentModalHTML(ass) {
+  return `
+    <div class="p-6 overflow-y-auto space-y-4 text-xs">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-pink-700 bg-pink-50 px-2 py-0.5 rounded-md">
+            Assignment ${ass.number} • ${ass.category}
+          </span>
+          <h3 class="text-base font-bold text-slate-900 mt-1">Assignment ${ass.number}: ${ass.title}</h3>
+        </div>
+        <button onclick="closeAllModals()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between font-semibold">
+        <span class="text-emerald-700 font-bold flex items-center gap-1">
+          <i data-lucide="award" class="w-4 h-4"></i> ${ass.status}
+        </span>
+        <span class="text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md font-extrabold">
+          ${ass.grade}
+        </span>
+      </div>
+
+      <div class="space-y-1.5">
+        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Assignment Overview:</h4>
+        <p class="text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-100">${ass.description}</p>
+      </div>
+
+      <div class="space-y-1.5">
+        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Submission Summary & Remarks:</h4>
+        <p class="text-slate-600 leading-relaxed bg-pink-50/50 p-3 rounded-xl border border-pink-100">${ass.details}</p>
+      </div>
+
+      <div class="pt-2 flex items-center justify-end">
+        <button onclick="closeAllModals()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-md">
+          Close Window
+        </button>
+      </div>
+    </div>
+  `;
 }

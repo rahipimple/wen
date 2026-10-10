@@ -105,6 +105,13 @@ function renderView(route) {
     case 'home':
       pageHTML = renderHomeView(window.APP_STATE);
       break;
+    case 'courses':
+    case 'courses-experiments':
+      pageHTML = renderCoursesView(window.APP_STATE, 'experiments');
+      break;
+    case 'courses-assignments':
+      pageHTML = renderCoursesView(window.APP_STATE, 'assignments');
+      break;
     case 'about':
       pageHTML = renderAboutView();
       break;
