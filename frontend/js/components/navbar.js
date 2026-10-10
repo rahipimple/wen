@@ -85,7 +85,7 @@ function renderNavbar(currentRoute, state) {
                     </button>
                     
                     <!-- Courses Dropdown Menu -->
-                    <div class="absolute top-full left-0 mt-1 w-60 bg-white rounded-2xl shadow-xl border border-purple-100 p-2.5 hidden group-hover:block transition-all z-50 animate-fade-in">
+                    <div class="absolute top-full left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-purple-100 p-2.5 hidden group-hover:block transition-all z-50 animate-fade-in">
                       <button 
                         onclick="navigate('courses'); switchCoursesTab('experiments');"
                         class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold hover:bg-purple-50 text-slate-700 hover:text-purple-800 flex items-center gap-3 transition"
@@ -95,7 +95,7 @@ function renderNavbar(currentRoute, state) {
                         </div>
                         <div>
                           <p class="font-bold text-slate-900">Experiments</p>
-                          <p class="text-[10px] text-slate-500 font-normal">Upload & View Lab Submissions</p>
+                          <p class="text-[10px] text-slate-500 font-normal">Lab Submissions (Exp 1 - 10)</p>
                         </div>
                       </button>
 
@@ -108,7 +108,20 @@ function renderNavbar(currentRoute, state) {
                         </div>
                         <div>
                           <p class="font-bold text-slate-900">Assignments</p>
-                          <p class="text-[10px] text-slate-500 font-normal">Upload & View Practical Work</p>
+                          <p class="text-[10px] text-slate-500 font-normal">Practical Work (Assign 1 - 8)</p>
+                        </div>
+                      </button>
+
+                      <button 
+                        onclick="navigate('courses'); switchCoursesTab('certificate-index');"
+                        class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold hover:bg-amber-50 text-slate-700 hover:text-amber-800 flex items-center gap-3 transition mt-1"
+                      >
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                          <i data-lucide="award" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                          <p class="font-bold text-slate-900">Certificate & Index</p>
+                          <p class="text-[10px] text-slate-500 font-normal">Academic Documents</p>
                         </div>
                       </button>
                     </div>
@@ -201,13 +214,19 @@ function renderNavbar(currentRoute, state) {
             onclick="navigate('courses'); switchCoursesTab('experiments'); toggleMobileMenu();"
             class="text-left px-3 py-2.5 rounded-xl text-xs font-semibold ${currentRoute.startsWith('courses') ? 'bg-purple-100 text-purple-800' : 'text-slate-700 hover:bg-slate-100'}"
           >
-            🔬 Experiments
+            🔬 Experiments (10)
           </button>
           <button 
             onclick="navigate('courses'); switchCoursesTab('assignments'); toggleMobileMenu();"
             class="text-left px-3 py-2.5 rounded-xl text-xs font-semibold ${currentRoute.startsWith('courses') ? 'bg-purple-100 text-purple-800' : 'text-slate-700 hover:bg-slate-100'}"
           >
-            📝 Assignments
+            📝 Assignments (8)
+          </button>
+          <button 
+            onclick="navigate('courses'); switchCoursesTab('certificate-index'); toggleMobileMenu();"
+            class="text-left px-3 py-2.5 rounded-xl text-xs font-semibold ${currentRoute.startsWith('courses') ? 'bg-amber-100 text-amber-800' : 'text-slate-700 hover:bg-slate-100'}"
+          >
+            📜 Certificate & Index
           </button>
           <button 
             onclick="navigate('mentors'); toggleMobileMenu();"

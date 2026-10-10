@@ -26,6 +26,15 @@ function openModal(modalType, payload = null) {
 
   if (!container || !backdrop || !content) return;
 
+  // Adjust max width based on modal type
+  if (['hardcodedExpModal', 'hardcodedAssignModal', 'hardcodedDocModal', 'experimentModal', 'assignmentModal'].includes(modalType)) {
+    content.classList.remove('max-w-lg');
+    content.classList.add('max-w-3xl');
+  } else {
+    content.classList.remove('max-w-3xl');
+    content.classList.add('max-w-lg');
+  }
+
   // Render appropriate modal template
   let html = '';
 
@@ -74,6 +83,9 @@ function openModal(modalType, payload = null) {
       break;
     case 'hardcodedAssignModal':
       html = getHardcodedAssignModalHTML(payload);
+      break;
+    case 'hardcodedDocModal':
+      html = getHardcodedDocModalHTML(payload);
       break;
     default:
       html = '<div class="p-6">No modal template found.</div>';
@@ -1058,10 +1070,7 @@ function getAssignmentModalHTML(ass) {
 
       <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between font-semibold">
         <span class="text-emerald-700 font-bold flex items-center gap-1">
-          <i data-lucide="award" class="w-4 h-4"></i> ${ass.status}
-        </span>
-        <span class="text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md font-extrabold">
-          ${ass.grade}
+          <i data-lucide="check-circle" class="w-4 h-4"></i> ${ass.status}
         </span>
       </div>
 
@@ -1094,7 +1103,7 @@ function openHardcodedExpModal(expId) {
 
 function getHardcodedExpModalHTML(exp) {
   return `
-    <div class="p-6 overflow-y-auto space-y-4 text-xs">
+    <div class="p-6 overflow-y-auto space-y-5 text-xs">
       <div class="flex items-start justify-between">
         <div>
           <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-100 text-purple-800 font-heading">
@@ -1117,41 +1126,68 @@ function getHardcodedExpModalHTML(exp) {
         <span class="text-slate-500 font-medium text-[11px]">Submitted: ${exp.date}</span>
       </div>
 
-      <!-- Embedded PDF Live Viewer Container -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">PDF Document (${exp.fileName}):</h4>
-          <div class="flex items-center gap-2">
+      <!-- Action Card & PDF Document Section -->
+      <div class="space-y-3">
+        <div class="p-4 rounded-2xl bg-white border border-purple-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs">${exp.fileName}</h4>
+              <p class="text-[11px] text-slate-500">Academic Lab PDF Document</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2 w-full sm:w-auto">
             <a 
               href="${exp.pdfFile}" 
               target="_blank" 
-              class="px-3 py-1 rounded-lg bg-purple-100 text-purple-800 hover:bg-purple-200 font-bold text-[11px] flex items-center gap-1"
+              class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
             >
-              <i data-lucide="external-link" class="w-3 h-3"></i>
-              <span>Open in New Tab</span>
+              <i data-lucide="external-link" class="w-4 h-4"></i>
+              <span>Open PDF in New Tab</span>
             </a>
             <a 
               href="${exp.pdfFile}" 
               download="${exp.fileName}"
-              class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-[11px] flex items-center gap-1"
+              class="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition"
             >
-              <i data-lucide="download" class="w-3 h-3"></i>
+              <i data-lucide="download" class="w-4 h-4"></i>
               <span>Download</span>
             </a>
           </div>
         </div>
 
-        <div class="w-full h-80 rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-inner">
-          <iframe 
-            src="${exp.pdfFile}" 
-            type="application/pdf"
-            class="w-full h-full border-0"
-            title="${exp.title}"
-          ></iframe>
+        <div class="w-full h-96 rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 shadow-inner relative">
+          <object 
+            data="${exp.pdfFile}" 
+            type="application/pdf" 
+            class="w-full h-full"
+          >
+            <div class="p-8 text-center flex flex-col items-center justify-center h-full space-y-3 bg-purple-50/50">
+              <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm">${exp.fileName}</h4>
+              <p class="text-xs text-slate-600 max-w-sm leading-relaxed">
+                Click below to open and view the complete PDF document directly in your browser's PDF viewer.
+              </p>
+              <a 
+                href="${exp.pdfFile}" 
+                target="_blank" 
+                class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md flex items-center gap-2 transition"
+              >
+                <i data-lucide="external-link" class="w-4 h-4"></i>
+                <span>Open ${exp.fileName} in New Tab</span>
+              </a>
+            </div>
+          </object>
         </div>
       </div>
 
-      <div class="pt-2 flex items-center justify-end">
+      <div class="pt-2 flex items-center justify-between border-t border-slate-100">
+        <p class="text-[11px] text-slate-400">PDF Location: frontend/pdfs/${exp.fileName}</p>
         <button onclick="closeAllModals()" class="px-5 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-md">
           Close Window
         </button>
@@ -1170,7 +1206,7 @@ function openHardcodedAssignModal(assignId) {
 
 function getHardcodedAssignModalHTML(ass) {
   return `
-    <div class="p-6 overflow-y-auto space-y-4 text-xs">
+    <div class="p-6 overflow-y-auto space-y-5 text-xs">
       <div class="flex items-start justify-between">
         <div>
           <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-pink-100 text-pink-800 font-heading">
@@ -1188,46 +1224,168 @@ function getHardcodedAssignModalHTML(ass) {
 
       <div class="p-3.5 rounded-2xl bg-pink-50 border border-pink-100 flex items-center justify-between font-semibold text-pink-900">
         <span class="flex items-center gap-1.5">
-          <i data-lucide="award" class="w-4 h-4 text-emerald-600"></i> ${ass.status}
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Status: ${ass.status}
         </span>
-        <span class="text-emerald-700 font-extrabold text-sm">${ass.score}</span>
+        <span class="text-slate-500 font-medium text-[11px]">Submitted: ${ass.date}</span>
       </div>
 
-      <!-- Embedded PDF Live Viewer Container -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">PDF Document (${ass.fileName}):</h4>
-          <div class="flex items-center gap-2">
+      <!-- Action Card & PDF Document Section -->
+      <div class="space-y-3">
+        <div class="p-4 rounded-2xl bg-white border border-pink-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-pink-100 text-pink-700 flex items-center justify-center shrink-0">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs">${ass.fileName}</h4>
+              <p class="text-[11px] text-slate-500">Academic Practical Assignment PDF Document</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2 w-full sm:w-auto">
             <a 
               href="${ass.pdfFile}" 
               target="_blank" 
-              class="px-3 py-1 rounded-lg bg-pink-100 text-pink-800 hover:bg-pink-200 font-bold text-[11px] flex items-center gap-1"
+              class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
             >
-              <i data-lucide="external-link" class="w-3 h-3"></i>
-              <span>Open in New Tab</span>
+              <i data-lucide="external-link" class="w-4 h-4"></i>
+              <span>Open PDF in New Tab</span>
             </a>
             <a 
               href="${ass.pdfFile}" 
               download="${ass.fileName}"
-              class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-[11px] flex items-center gap-1"
+              class="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition"
             >
-              <i data-lucide="download" class="w-3 h-3"></i>
+              <i data-lucide="download" class="w-4 h-4"></i>
               <span>Download</span>
             </a>
           </div>
         </div>
 
-        <div class="w-full h-80 rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-inner">
-          <iframe 
-            src="${ass.pdfFile}" 
-            type="application/pdf"
-            class="w-full h-full border-0"
-            title="${ass.title}"
-          ></iframe>
+        <div class="w-full h-96 rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 shadow-inner relative">
+          <object 
+            data="${ass.pdfFile}" 
+            type="application/pdf" 
+            class="w-full h-full"
+          >
+            <div class="p-8 text-center flex flex-col items-center justify-center h-full space-y-3 bg-pink-50/50">
+              <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm">${ass.fileName}</h4>
+              <p class="text-xs text-slate-600 max-w-sm leading-relaxed">
+                Click below to open and view the complete PDF document directly in your browser's PDF viewer.
+              </p>
+              <a 
+                href="${ass.pdfFile}" 
+                target="_blank" 
+                class="px-5 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs shadow-md flex items-center gap-2 transition"
+              >
+                <i data-lucide="external-link" class="w-4 h-4"></i>
+                <span>Open ${ass.fileName} in New Tab</span>
+              </a>
+            </div>
+          </object>
         </div>
       </div>
 
-      <div class="pt-2 flex items-center justify-end">
+      <div class="pt-2 flex items-center justify-between border-t border-slate-100">
+        <p class="text-[11px] text-slate-400">PDF Location: frontend/pdfs/${ass.fileName}</p>
+        <button onclick="closeAllModals()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-md">
+          Close Window
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ----------------------------------------------------
+// 15. HARDCODED 1-PAGE DOCUMENT VIEW MODAL (Certificate & Index)
+// ----------------------------------------------------
+function openHardcodedDocModal(docId) {
+  const doc = (HARDCODED_COURSES.documents && HARDCODED_COURSES.documents.find(d => d.id === docId)) || {
+    id: docId,
+    label: docId.includes('cert') ? 'Certificate' : 'Index',
+    title: docId.includes('cert') ? 'Certificate PDF Document' : 'Index PDF Document',
+    fileName: docId.includes('cert') ? 'Certificate.pdf' : 'Index.pdf',
+    pdfFile: docId.includes('cert') ? 'pdfs/Certificate.pdf' : 'pdfs/Index.pdf',
+    status: '1-Page PDF',
+    date: 'Oct 2026'
+  };
+  openModal('hardcodedDocModal', doc);
+}
+
+function getHardcodedDocModalHTML(doc) {
+  return `
+    <div class="p-6 overflow-y-auto space-y-5 text-xs">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-heading">
+            ${doc.label}
+          </span>
+          <h3 class="text-base font-bold text-slate-900 mt-2 font-heading flex items-center gap-2">
+            <i data-lucide="award" class="w-5 h-5 text-amber-600"></i>
+            <span>${doc.title}</span>
+          </h3>
+        </div>
+        <button onclick="closeAllModals()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between font-semibold text-amber-900">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Status: ${doc.status}
+        </span>
+        <span class="text-slate-500 font-medium text-[11px]">Submitted: ${doc.date}</span>
+      </div>
+
+      <!-- Action Card & PDF Document Section -->
+      <div class="space-y-3">
+        <div class="p-4 rounded-2xl bg-white border border-amber-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs">${doc.fileName}</h4>
+              <p class="text-[11px] text-slate-500">Academic PDF Document</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a 
+              href="${doc.pdfFile}" 
+              download="${doc.fileName}"
+              class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
+            >
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="w-full h-96 rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 shadow-inner relative">
+          <object 
+            data="${doc.pdfFile}" 
+            type="application/pdf" 
+            class="w-full h-full"
+          >
+            <div class="p-8 text-center flex flex-col items-center justify-center h-full space-y-3 bg-amber-50/50">
+              <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm">${doc.fileName} (1 Page)</h4>
+              <p class="text-xs text-slate-600 max-w-sm leading-relaxed">
+                Single-page document preview. Place your 1-page <code>${doc.fileName}</code> file in <code>frontend/pdfs/</code>.
+              </p>
+            </div>
+          </object>
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center justify-between border-t border-slate-100">
+        <p class="text-[11px] text-slate-400">Target Location: frontend/pdfs/${doc.fileName}</p>
         <button onclick="closeAllModals()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-md">
           Close Window
         </button>
