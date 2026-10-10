@@ -1117,33 +1117,37 @@ function getHardcodedExpModalHTML(exp) {
         <span class="text-slate-500 font-medium text-[11px]">Submitted: ${exp.date}</span>
       </div>
 
-      <!-- Embedded PDF Preview Container -->
+      <!-- Embedded PDF Live Viewer Container -->
       <div class="space-y-2">
-        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Submitted PDF Document (${exp.fileName}):</h4>
-        <div class="w-full h-64 rounded-2xl border border-slate-200 overflow-hidden bg-slate-900 flex flex-col items-center justify-center text-white p-6 space-y-3">
-          <i data-lucide="file-text" class="w-12 h-12 text-purple-400 animate-pulse"></i>
-          <p class="font-bold text-sm text-purple-200">${exp.fileName}</p>
-          <p class="text-xs text-slate-400 text-center max-w-sm">
-            Official Practical Document ready for professor review & download.
-          </p>
-          <div class="flex items-center gap-3 pt-2">
+        <div class="flex items-center justify-between">
+          <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">PDF Document (${exp.fileName}):</h4>
+          <div class="flex items-center gap-2">
             <a 
               href="${exp.pdfFile}" 
               target="_blank" 
-              class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
+              class="px-3 py-1 rounded-lg bg-purple-100 text-purple-800 hover:bg-purple-200 font-bold text-[11px] flex items-center gap-1"
             >
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-              <span>Open PDF in New Tab</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+              <span>Open in New Tab</span>
             </a>
             <a 
               href="${exp.pdfFile}" 
               download="${exp.fileName}"
-              class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700"
+              class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-[11px] flex items-center gap-1"
             >
-              <i data-lucide="download" class="w-3.5 h-3.5"></i>
-              <span>Download PDF</span>
+              <i data-lucide="download" class="w-3 h-3"></i>
+              <span>Download</span>
             </a>
           </div>
+        </div>
+
+        <div class="w-full h-80 rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-inner">
+          <iframe 
+            src="${exp.pdfFile}" 
+            type="application/pdf"
+            class="w-full h-full border-0"
+            title="${exp.title}"
+          ></iframe>
         </div>
       </div>
 
@@ -1189,33 +1193,37 @@ function getHardcodedAssignModalHTML(ass) {
         <span class="text-emerald-700 font-extrabold text-sm">${ass.score}</span>
       </div>
 
-      <!-- Embedded PDF Preview Container -->
+      <!-- Embedded PDF Live Viewer Container -->
       <div class="space-y-2">
-        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Submitted PDF Document (${ass.fileName}):</h4>
-        <div class="w-full h-64 rounded-2xl border border-slate-200 overflow-hidden bg-slate-900 flex flex-col items-center justify-center text-white p-6 space-y-3">
-          <i data-lucide="file-text" class="w-12 h-12 text-pink-400 animate-pulse"></i>
-          <p class="font-bold text-sm text-pink-200">${ass.fileName}</p>
-          <p class="text-xs text-slate-400 text-center max-w-sm">
-            Official Practical Assignment Document submitted for professor grading.
-          </p>
-          <div class="flex items-center gap-3 pt-2">
+        <div class="flex items-center justify-between">
+          <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">PDF Document (${ass.fileName}):</h4>
+          <div class="flex items-center gap-2">
             <a 
               href="${ass.pdfFile}" 
               target="_blank" 
-              class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
+              class="px-3 py-1 rounded-lg bg-pink-100 text-pink-800 hover:bg-pink-200 font-bold text-[11px] flex items-center gap-1"
             >
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-              <span>Open PDF in New Tab</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+              <span>Open in New Tab</span>
             </a>
             <a 
               href="${ass.pdfFile}" 
               download="${ass.fileName}"
-              class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-pink-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700"
+              class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-[11px] flex items-center gap-1"
             >
-              <i data-lucide="download" class="w-3.5 h-3.5"></i>
-              <span>Download PDF</span>
+              <i data-lucide="download" class="w-3 h-3"></i>
+              <span>Download</span>
             </a>
           </div>
+        </div>
+
+        <div class="w-full h-80 rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-inner">
+          <iframe 
+            src="${ass.pdfFile}" 
+            type="application/pdf"
+            class="w-full h-full border-0"
+            title="${ass.title}"
+          ></iframe>
         </div>
       </div>
 

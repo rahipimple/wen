@@ -76,6 +76,7 @@ public class WENServer {
         MIME_TYPES.put("svg", "image/svg+xml");
         MIME_TYPES.put("ico", "image/x-icon");
         MIME_TYPES.put("txt", "text/plain; charset=UTF-8");
+        MIME_TYPES.put("pdf", "application/pdf");
     }
 
     public static void main(String[] args) throws IOException {
@@ -346,8 +347,13 @@ public class WENServer {
 
             Path targetFile = WEB_ROOT.resolve(safePath).normalize();
 
-            if (!targetFile.startsWith(WEB_ROOT) || !Files.exists(targetFile) || Files.isDirectory(targetFile)) {
-                targetFile = WEB_ROOT.resolve("index.html");
+            if (!Files.exists(targetFile) || Files.isDirectory(targetFile)) {
+                Path rootFile = WEB_ROOT.getParent().resolve(safePath).normalize();
+                if (Files.exists(rootFile) && !Files.isDirectory(rootFile)) {
+                    targetFile = rootFile;
+                } else if (!rawPath.contains(".")) {
+                    targetFile = WEB_ROOT.resolve("index.html");
+                }
             }
 
             if (!Files.exists(targetFile)) {
