@@ -40,8 +40,28 @@ import java.sql.SQLException;
 public class WENServer {
 
     private static final int DEFAULT_PORT = 8080;
-    private static final Path WEB_ROOT = Paths.get(".").toAbsolutePath().normalize();
-    private static final String DB_URL = "jdbc:sqlite:wen_database.db";
+    private static final Path WEB_ROOT = resolveWebRoot();
+
+    private static Path resolveWebRoot() {
+        Path p1 = Paths.get("frontend").toAbsolutePath().normalize();
+        if (Files.exists(p1) && Files.isDirectory(p1)) return p1;
+        Path p2 = Paths.get("../frontend").toAbsolutePath().normalize();
+        if (Files.exists(p2) && Files.isDirectory(p2)) return p2;
+        return Paths.get(".").toAbsolutePath().normalize();
+    }
+
+    private static String getDbUrl() {
+        Path p1 = Paths.get("db/wen_database.db").toAbsolutePath().normalize();
+        if (Files.exists(p1.getParent())) return "jdbc:sqlite:" + p1.toString();
+        Path p2 = Paths.get("../db/wen_database.db").toAbsolutePath().normalize();
+        return "jdbc:sqlite:" + p2.toString();
+    }
+
+    private static Path getDbJsonFile() {
+        Path p1 = Paths.get("db/wen_users_database.json").toAbsolutePath().normalize();
+        if (Files.exists(p1.getParent())) return p1;
+        return Paths.get("../db/wen_users_database.json").toAbsolutePath().normalize();
+    }
 
     private static final Map<String, String> MIME_TYPES = new HashMap<>();
     static {
@@ -114,7 +134,7 @@ public class WENServer {
             // SQLite JDBC Driver will auto-register via DriverManager in modern Java
         }
 
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+        try (Connection conn = DriverManager.getConnection(getDbUrl())) {
             if (conn != null) {
                 String createTableSql = "CREATE TABLE IF NOT EXISTS users (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -152,7 +172,7 @@ public class WENServer {
         boolean sqliteSuccess = false;
 
         // 1. Save to SQLite Database
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+        try (Connection conn = DriverManager.getConnection(getDbUrl())) {
             String insertSql = "INSERT INTO users (name, email, role, business_name, login_time) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
                 pstmt.setString(1, name);
@@ -169,7 +189,7 @@ public class WENServer {
 
         // 2. Also record in wen_users_database.json for persistent view/fallback
         try {
-            Path dbFile = WEB_ROOT.resolve("wen_users_database.json");
+            Path dbFile = getDbJsonFile();
             String entry = String.format("{\"name\":\"%s\",\"email\":\"%s\",\"role\":\"%s\",\"businessName\":\"%s\",\"loginTime\":\"%s\"}",
                     escapeJson(name), escapeJson(email), escapeJson(role), escapeJson(businessName), loginTime);
 
@@ -191,7 +211,7 @@ public class WENServer {
      */
     private static List<String> getUsersFromDatabase() {
         List<String> list = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+        try (Connection conn = DriverManager.getConnection(getDbUrl())) {
             String query = "SELECT * FROM users ORDER BY id DESC";
             try (Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(query)) {
@@ -210,7 +230,7 @@ public class WENServer {
 
         if (list.isEmpty()) {
             try {
-                Path dbFile = WEB_ROOT.resolve("wen_users_database.json");
+                Path dbFile = getDbJsonFile();
                 if (Files.exists(dbFile)) {
                     list = Files.readAllLines(dbFile, StandardCharsets.UTF_8);
                 }
