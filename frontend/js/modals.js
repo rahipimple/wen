@@ -1308,7 +1308,7 @@ function openHardcodedDocModal(docId) {
     label: docId.includes('cert') ? 'Certificate' : 'Index',
     title: docId.includes('cert') ? 'Certificate PDF Document' : 'Index PDF Document',
     fileName: docId.includes('cert') ? 'Certificate.pdf' : 'Index.pdf',
-    pdfFile: docId.includes('cert') ? 'pdfs/Certificate.pdf' : 'pdfs/Index.pdf',
+    pdfFile: docId.includes('cert') ? '/pdfs/Certificate.pdf' : '/pdfs/Index.pdf',
     status: '1-Page PDF',
     date: 'Oct 2026'
   };
