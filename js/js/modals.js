@@ -69,6 +69,12 @@ function openModal(modalType, payload = null) {
     case 'assignmentModal':
       html = getAssignmentModalHTML(payload);
       break;
+    case 'hardcodedExpModal':
+      html = getHardcodedExpModalHTML(payload);
+      break;
+    case 'hardcodedAssignModal':
+      html = getHardcodedAssignModalHTML(payload);
+      break;
     default:
       html = '<div class="p-6">No modal template found.</div>';
   }
@@ -1067,6 +1073,150 @@ function getAssignmentModalHTML(ass) {
       <div class="space-y-1.5">
         <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Submission Summary & Remarks:</h4>
         <p class="text-slate-600 leading-relaxed bg-pink-50/50 p-3 rounded-xl border border-pink-100">${ass.details}</p>
+      </div>
+
+      <div class="pt-2 flex items-center justify-end">
+        <button onclick="closeAllModals()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-md">
+          Close Window
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ----------------------------------------------------
+// 13. HARDCODED EXPERIMENT VIEW MODAL
+// ----------------------------------------------------
+function openHardcodedExpModal(expId) {
+  const exp = HARDCODED_COURSES.experiments.find(e => e.id === expId) || HARDCODED_COURSES.experiments[0];
+  openModal('hardcodedExpModal', exp);
+}
+
+function getHardcodedExpModalHTML(exp) {
+  return `
+    <div class="p-6 overflow-y-auto space-y-4 text-xs">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-100 text-purple-800 font-heading">
+            ${exp.label}
+          </span>
+          <h3 class="text-base font-bold text-slate-900 mt-2 font-heading flex items-center gap-2">
+            <i data-lucide="file-text" class="w-5 h-5 text-purple-600"></i>
+            <span>${exp.title}</span>
+          </h3>
+        </div>
+        <button onclick="closeAllModals()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-between font-semibold text-purple-900">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Status: ${exp.status}
+        </span>
+        <span class="text-slate-500 font-medium text-[11px]">Submitted: ${exp.date}</span>
+      </div>
+
+      <!-- Embedded PDF Preview Container -->
+      <div class="space-y-2">
+        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Submitted PDF Document (${exp.fileName}):</h4>
+        <div class="w-full h-64 rounded-2xl border border-slate-200 overflow-hidden bg-slate-900 flex flex-col items-center justify-center text-white p-6 space-y-3">
+          <i data-lucide="file-text" class="w-12 h-12 text-purple-400 animate-pulse"></i>
+          <p class="font-bold text-sm text-purple-200">${exp.fileName}</p>
+          <p class="text-xs text-slate-400 text-center max-w-sm">
+            Official Practical Document ready for professor review & download.
+          </p>
+          <div class="flex items-center gap-3 pt-2">
+            <a 
+              href="${exp.pdfFile}" 
+              target="_blank" 
+              class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
+            >
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              <span>Open PDF in New Tab</span>
+            </a>
+            <a 
+              href="${exp.pdfFile}" 
+              download="${exp.fileName}"
+              class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700"
+            >
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Download PDF</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center justify-end">
+        <button onclick="closeAllModals()" class="px-5 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-md">
+          Close Window
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ----------------------------------------------------
+// 14. HARDCODED ASSIGNMENT VIEW MODAL
+// ----------------------------------------------------
+function openHardcodedAssignModal(assignId) {
+  const ass = HARDCODED_COURSES.assignments.find(a => a.id === assignId) || HARDCODED_COURSES.assignments[0];
+  openModal('hardcodedAssignModal', ass);
+}
+
+function getHardcodedAssignModalHTML(ass) {
+  return `
+    <div class="p-6 overflow-y-auto space-y-4 text-xs">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-pink-100 text-pink-800 font-heading">
+            ${ass.label}
+          </span>
+          <h3 class="text-base font-bold text-slate-900 mt-2 font-heading flex items-center gap-2">
+            <i data-lucide="file-text" class="w-5 h-5 text-pink-600"></i>
+            <span>${ass.title}</span>
+          </h3>
+        </div>
+        <button onclick="closeAllModals()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-pink-50 border border-pink-100 flex items-center justify-between font-semibold text-pink-900">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="award" class="w-4 h-4 text-emerald-600"></i> ${ass.status}
+        </span>
+        <span class="text-emerald-700 font-extrabold text-sm">${ass.score}</span>
+      </div>
+
+      <!-- Embedded PDF Preview Container -->
+      <div class="space-y-2">
+        <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Submitted PDF Document (${ass.fileName}):</h4>
+        <div class="w-full h-64 rounded-2xl border border-slate-200 overflow-hidden bg-slate-900 flex flex-col items-center justify-center text-white p-6 space-y-3">
+          <i data-lucide="file-text" class="w-12 h-12 text-pink-400 animate-pulse"></i>
+          <p class="font-bold text-sm text-pink-200">${ass.fileName}</p>
+          <p class="text-xs text-slate-400 text-center max-w-sm">
+            Official Practical Assignment Document submitted for professor grading.
+          </p>
+          <div class="flex items-center gap-3 pt-2">
+            <a 
+              href="${ass.pdfFile}" 
+              target="_blank" 
+              class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
+            >
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              <span>Open PDF in New Tab</span>
+            </a>
+            <a 
+              href="${ass.pdfFile}" 
+              download="${ass.fileName}"
+              class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-pink-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700"
+            >
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Download PDF</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       <div class="pt-2 flex items-center justify-end">
