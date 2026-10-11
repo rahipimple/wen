@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Women Entrepreneur Network (WEN) with MongoDB",
   "scripts": {
-    "mongo:setup": "node db/setup_mongodb.js"
+    "mongo:setup": "node db/setup_mongodb.js",
+    "sync": "node sync-from-cloud.js"
   },
   "dependencies": {
     "mongodb": "^6.5.0"
