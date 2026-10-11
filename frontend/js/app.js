@@ -252,7 +252,8 @@ window.addEventListener('hashchange', () => {
 // Real-Time MongoDB Automated Live Sync Controller
 async function syncMongoUsers() {
   try {
-    const apiBase = window.location.port === '8080' ? '' : 'http://localhost:8080';
+    const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiBase = (isLocalDev && window.location.port !== '8080') ? 'http://localhost:8080' : '';
     const res = await fetch(`${apiBase}/api/users`);
     if (!res.ok) return;
     const data = await res.json();

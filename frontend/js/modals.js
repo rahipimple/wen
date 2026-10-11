@@ -950,8 +950,9 @@ function handleAuthSubmit(e) {
     persistState();
   }
 
-  // Send Login details to backend server in background
-  const apiBase = window.location.port === '8080' ? '' : 'http://localhost:8080';
+  // Send Login details to backend server (Vercel Serverless Function or Local Server)
+  const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const apiBase = (isLocalDev && window.location.port !== '8080') ? 'http://localhost:8080' : '';
   fetch(`${apiBase}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

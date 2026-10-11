@@ -34,7 +34,7 @@ public class WENServer {
 
     private static final int DEFAULT_PORT = 8080;
     private static final Path WEB_ROOT = resolveWebRoot();
-    private static final String ACTIVE_DB_TYPE = "MongoDB (wen_db.users)";
+    private static final String ACTIVE_DB_TYPE = "MongoDB Atlas Cloud (wen_db.users)";
 
     private static Path resolveWebRoot() {
         Path p1 = Paths.get("frontend").toAbsolutePath().normalize();
@@ -45,7 +45,7 @@ public class WENServer {
     }
 
     private static String getMongoUri() {
-        return System.getenv().getOrDefault("MONGODB_URI", "mongodb://localhost:27017/wen_db");
+        return System.getenv().getOrDefault("MONGODB_URI", "mongodb+srv://rahipimple26_db_user:Fr6yishVNjxGmZBW@cluster0.8afkhto.mongodb.net/wen_db?retryWrites=true&w=majority&appName=Cluster0");
     }
 
     private static Path getDbJsonFile() {
