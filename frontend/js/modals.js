@@ -833,34 +833,62 @@ function handleCreatePost(e) {
 // ----------------------------------------------------
 // 9. AUTH / SIGN UP / LOGIN MODAL
 // ----------------------------------------------------
-function getAuthModalHTML(defaultMode = 'signup') {
+function getAuthModalHTML(defaultMode = 'new') {
+  const isNew = defaultMode === 'new';
+  const initName = isNew ? '' : (window.APP_STATE.currentUser.name || '');
+  const initEmail = isNew ? '' : (window.APP_STATE.currentUser.email || '');
+  const initBusiness = isNew ? '' : (window.APP_STATE.currentUser.businessName || '');
+
   return `
     <div class="p-6 overflow-y-auto space-y-5 text-xs">
-      <div class="text-center space-y-1">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 p-0.5 mx-auto flex items-center justify-center text-white font-extrabold text-sm">
-          WEN
+      <div class="flex items-start justify-between">
+        <div class="space-y-1">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 p-0.5 flex items-center justify-center text-white font-extrabold text-sm shadow-md">
+            WEN
+          </div>
+          <h3 class="text-lg font-black text-slate-900 font-heading pt-1">${isNew ? 'Register as New Founder' : 'Switch Account / Login'}</h3>
+          <p class="text-slate-500">“Stronger Women • Stronger Businesses • A Brighter Tomorrow”</p>
         </div>
-        <h3 class="text-lg font-black text-slate-900 font-heading">Welcome to Women Entrepreneur Network</h3>
-        <p class="text-slate-500">“Stronger Women • Stronger Businesses • A Brighter Tomorrow”</p>
+        <button onclick="closeAllModals()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <div class="flex items-center gap-2 p-1 bg-slate-100 rounded-xl">
+        <button 
+          type="button" 
+          onclick="openModal('authModal', 'new')"
+          class="flex-1 py-1.5 text-center font-bold text-xs rounded-lg transition ${isNew ? 'bg-white shadow-xs text-purple-800' : 'text-slate-600'}"
+        >
+          ➕ New User Sign Up
+        </button>
+        <button 
+          type="button" 
+          onclick="openModal('authModal', 'existing')"
+          class="flex-1 py-1.5 text-center font-bold text-xs rounded-lg transition ${!isNew ? 'bg-white shadow-xs text-purple-800' : 'text-slate-600'}"
+        >
+          👤 Current Profile
+        </button>
       </div>
 
       <form onsubmit="handleAuthSubmit(event)" class="space-y-3.5">
         <div class="space-y-1">
           <label class="font-bold text-slate-700">Full Name:</label>
-          <input type="text" name="name" required placeholder="e.g., Ananya Deshmukh" value="${window.APP_STATE.currentUser.name}" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50" />
+          <input type="text" name="name" required placeholder="e.g., Neha Sharma" value="${initName}" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-purple-600" />
         </div>
 
         <div class="space-y-1">
           <label class="font-bold text-slate-700">Email Address:</label>
-          <input type="email" name="email" required placeholder="ananya@yourventure.com" value="${window.APP_STATE.currentUser.email}" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50" />
+          <input type="email" name="email" required placeholder="neha@startupventures.com" value="${initEmail}" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-purple-600" />
         </div>
 
         <div class="space-y-1">
           <label class="font-bold text-slate-700">Your Entrepreneurial Profile / Role:</label>
           <select name="role" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-purple-800">
+            <option value="Early-Stage Startup Founder" selected>Early-Stage Startup Founder</option>
             <option value="Aspiring Entrepreneur">Aspiring Entrepreneur (Idea Stage)</option>
             <option value="Home-Based Business Owner">Home-Based Business Owner</option>
-            <option value="Early-Stage Startup Founder" selected>Early-Stage Startup Founder</option>
             <option value="Student Innovator">Student Innovator</option>
             <option value="Mentor / Advisor">Mentor / Advisor</option>
           </select>
@@ -868,12 +896,13 @@ function getAuthModalHTML(defaultMode = 'signup') {
 
         <div class="space-y-1">
           <label class="font-bold text-slate-700">Business or Venture Name:</label>
-          <input type="text" name="businessName" value="${window.APP_STATE.currentUser.businessName}" placeholder="e.g., EcoStyle Studios" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50" />
+          <input type="text" name="businessName" value="${initBusiness}" placeholder="e.g., SilkCraft Innovations" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-purple-600" />
         </div>
 
         <div class="pt-3">
-          <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 text-white font-bold text-xs shadow-md hover-lift">
-            Enter Platform & Open Dashboard
+          <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 text-white font-bold text-xs shadow-md hover-lift flex items-center justify-center gap-2">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>${isNew ? 'Create Account & Save to MongoDB' : 'Save Profile & Open Dashboard'}</span>
           </button>
         </div>
       </form>
@@ -897,18 +926,21 @@ function handleAuthSubmit(e) {
   window.APP_STATE.currentUser.businessName = loginData.businessName;
 
   // Send Login details to Java Backend API & MongoDB Collection (wen_db.users)
-  fetch('/api/login', {
+  const apiBase = window.location.port === '8080' ? '' : 'http://localhost:8080';
+  fetch(`${apiBase}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(loginData)
   }).then(res => res.json())
     .then(data => {
       console.log('[MONGODB RESPONSE]', data);
+      showToast(`User "${loginData.name}" successfully saved to MongoDB (wen_db.users)!`, 'success');
       if (typeof window.syncMongoUsers === 'function') {
         window.syncMongoUsers();
       }
     }).catch(err => {
-      console.warn('MongoDB sync note:', err);
+      console.warn('MongoDB server offline note:', err);
+      showToast(`Saved locally. (Note: Start Java server on port 8080 for MongoDB write)`, 'info');
     });
 
   closeAllModals();

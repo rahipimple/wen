@@ -177,6 +177,16 @@ function renderNavbar(currentRoute, state) {
               </div>
               <i data-lucide="layout-dashboard" class="w-4 h-4 text-purple-600"></i>
             </button>
+
+            <!-- DEDICATED NEW USER BUTTON -->
+            <button 
+              onclick="openModal('authModal', 'new')"
+              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:to-pink-700 text-white font-extrabold text-xs shadow-md hover-lift transition cursor-pointer"
+              title="Add / Register New User into MongoDB"
+            >
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>+ Add New User</span>
+            </button>
           </div>
 
           <!-- Mobile Hamburger Toggle -->
@@ -254,6 +264,12 @@ function renderNavbar(currentRoute, state) {
             class="w-full py-2.5 px-4 rounded-xl border border-purple-200 text-purple-700 font-semibold text-xs flex items-center justify-center gap-2 bg-purple-50/50"
           >
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Open Dashboard
+          </button>
+          <button 
+            onclick="openModal('authModal'); toggleMobileMenu();"
+            class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm"
+          >
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Login as New User
           </button>
         </div>
       </div>

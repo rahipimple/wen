@@ -1,9 +1,9 @@
 @echo off
-title WEN Database Viewer
+title WEN MongoDB Database Inspector
 echo ===================================================================
-echo   WEN SQL DATABASE VIEWER (db\wen_database.db)
+echo   WEN MONGODB DATABASE INSPECTOR (wen_db.users)
 echo ===================================================================
 echo.
 cd /d "%~dp0backend"
-java -cp ".;..\db\sqlite-jdbc.jar" WENServer CheckDB
+java WENServer CheckDB
 pause

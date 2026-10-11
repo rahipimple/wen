@@ -67,11 +67,12 @@ function renderDashboardView(state) {
               <i data-lucide="calendar" class="w-4 h-4 text-purple-300"></i> Book Mentor
             </button>
             <button 
-              onclick="openModal('authModal')"
-              class="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs"
-              title="Switch Demo Profile"
+              onclick="openModal('authModal', 'new')"
+              class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs backdrop-blur-xs flex items-center gap-1.5"
+              title="Log in as a different user or register"
             >
-              <i data-lucide="user-cog" class="w-4 h-4"></i>
+              <i data-lucide="user-plus" class="w-4 h-4 text-pink-300"></i>
+              <span>Switch / New User</span>
             </button>
           </div>
 
