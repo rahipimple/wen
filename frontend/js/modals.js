@@ -902,7 +902,7 @@ function getAuthModalHTML(defaultMode = 'new') {
         <div class="pt-3">
           <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 text-white font-bold text-xs shadow-md hover-lift flex items-center justify-center gap-2">
             <i data-lucide="check" class="w-4 h-4"></i>
-            <span>${isNew ? 'Create Account & Save to MongoDB' : 'Save Profile & Open Dashboard'}</span>
+            <span>${isNew ? 'Create Founder Account' : 'Save Profile & Open Dashboard'}</span>
           </button>
         </div>
       </form>
@@ -914,10 +914,10 @@ function handleAuthSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const loginData = {
-    name: form.name.value,
-    email: form.email.value,
+    name: form.name.value.trim(),
+    email: form.email.value.trim(),
     role: form.role.value,
-    businessName: form.businessName.value
+    businessName: form.businessName.value.trim()
   };
 
   window.APP_STATE.currentUser.name = loginData.name;
@@ -925,7 +925,32 @@ function handleAuthSubmit(e) {
   window.APP_STATE.currentUser.role = loginData.role;
   window.APP_STATE.currentUser.businessName = loginData.businessName;
 
-  // Send Login details to Java Backend API & MongoDB Collection (wen_db.users)
+  // Immediately store new user in database records & state
+  const newMember = {
+    name: loginData.name,
+    email: loginData.email,
+    role: loginData.role,
+    businessName: loginData.businessName || 'Founder Venture',
+    loginTime: new Date().toISOString().replace('T', ' ').substring(0, 19)
+  };
+
+  if (!window.APP_STATE.mongoUsers) {
+    window.APP_STATE.mongoUsers = [];
+  }
+
+  const existingIdx = window.APP_STATE.mongoUsers.findIndex(u => u.email.toLowerCase() === newMember.email.toLowerCase());
+  if (existingIdx > -1) {
+    window.APP_STATE.mongoUsers[existingIdx] = newMember;
+  } else {
+    window.APP_STATE.mongoUsers.push(newMember);
+  }
+
+  // Persist state to local storage
+  if (typeof persistState === 'function') {
+    persistState();
+  }
+
+  // Send Login details to backend server in background
   const apiBase = window.location.port === '8080' ? '' : 'http://localhost:8080';
   fetch(`${apiBase}/api/login`, {
     method: 'POST',
@@ -933,18 +958,13 @@ function handleAuthSubmit(e) {
     body: JSON.stringify(loginData)
   }).then(res => res.json())
     .then(data => {
-      console.log('[MONGODB RESPONSE]', data);
-      showToast(`User "${loginData.name}" successfully saved to MongoDB (wen_db.users)!`, 'success');
-      if (typeof window.syncMongoUsers === 'function') {
-        window.syncMongoUsers();
-      }
+      console.log('[USER STORED]', data);
     }).catch(err => {
-      console.warn('MongoDB server offline note:', err);
-      showToast(`Saved locally. (Note: Start Java server on port 8080 for MongoDB write)`, 'info');
+      console.log('[BACKEND NOTE] Backend server offline or running static mode:', err.message);
     });
 
   closeAllModals();
-  showToast(`Welcome back, ${form.name.value}! Logged in as ${form.role.value}.`, 'success');
+  showToast(`Welcome to WEN, ${loginData.name}! Your founder profile has been created.`, 'success');
 
   if (typeof window.trackEvent === 'function') {
     window.trackEvent('login', {

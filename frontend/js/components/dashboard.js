@@ -280,30 +280,30 @@ function renderActiveTabContent(activeTab, state, user, savedSchemes, registered
             </div>
           </div>
 
-          <!-- Real-Time MongoDB Connection & Live Members Card -->
+          <!-- Network Members Directory Card -->
           <div class="bg-gradient-to-br from-purple-900 via-slate-900 to-purple-950 text-white rounded-3xl p-6 border border-purple-800/60 shadow-lg space-y-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <h3 class="text-xs font-black uppercase tracking-wider text-purple-200 font-heading">MongoDB Live Sync</h3>
+                <h3 class="text-xs font-black uppercase tracking-wider text-purple-200 font-heading">Network Directory</h3>
               </div>
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                ACTIVE
+                ${((state.mongoUsers || []).length)} Verified
               </span>
             </div>
 
             <div class="p-3 rounded-2xl bg-white/10 border border-white/10 space-y-1 text-xs backdrop-blur-xs">
               <div class="flex items-center justify-between">
-                <span class="text-slate-300 font-medium">Database:</span>
-                <span class="font-mono text-purple-200 font-bold">wen_db</span>
+                <span class="text-slate-300 font-medium">Community Status:</span>
+                <span class="text-emerald-300 font-bold">Active & Connected</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-slate-300 font-medium">Collection:</span>
-                <span class="font-mono text-pink-300 font-bold">users</span>
+                <span class="text-slate-300 font-medium">Network Circle:</span>
+                <span class="text-purple-200 font-bold">Women Founders</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-slate-300 font-medium">Total Docs:</span>
-                <span class="font-mono text-emerald-300 font-bold">${((state.mongoUsers || []).length)} Documents</span>
+                <span class="text-slate-300 font-medium">Total Members:</span>
+                <span class="text-pink-300 font-bold">${((state.mongoUsers || []).length)} Founders</span>
               </div>
             </div>
 

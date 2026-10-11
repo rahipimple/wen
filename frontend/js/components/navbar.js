@@ -182,7 +182,7 @@ function renderNavbar(currentRoute, state) {
             <button 
               onclick="openModal('authModal', 'new')"
               class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:to-pink-700 text-white font-extrabold text-xs shadow-md hover-lift transition cursor-pointer"
-              title="Add / Register New User into MongoDB"
+              title="Register a new founder account"
             >
               <i data-lucide="user-plus" class="w-4 h-4"></i>
               <span>+ Add New User</span>

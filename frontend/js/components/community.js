@@ -200,23 +200,23 @@ function renderCommunityView(state) {
           <!-- RIGHT: Groups & Chapters Sidebar -->
           <div class="lg:col-span-4 space-y-6">
             
-            <!-- Live MongoDB Database Sync Members Card -->
+            <!-- Active Founder Community Members Card -->
             <div class="bg-gradient-to-br from-slate-900 to-purple-950 text-white rounded-2xl p-5 border border-purple-800/50 shadow-md space-y-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <h3 class="text-xs font-extrabold uppercase tracking-wider font-heading text-purple-200">Live MongoDB Sync</h3>
+                  <h3 class="text-xs font-extrabold uppercase tracking-wider font-heading text-purple-200">Active Founders</h3>
                 </div>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  wen_db.users
+                  ${(state.mongoUsers || []).length} Members
                 </span>
               </div>
               <p class="text-[11px] text-slate-300">
-                Real-time MongoDB documents auto-synced across codebase (${(state.mongoUsers || []).length} registered):
+                Recently joined entrepreneurs in our network:
               </p>
               <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
                 ${((state.mongoUsers || []).length === 0) 
-                  ? `<div class="text-[11px] text-slate-400 italic">No users in MongoDB collection yet.</div>`
+                  ? `<div class="text-[11px] text-slate-400 italic">No members joined yet.</div>`
                   : (state.mongoUsers || []).slice().reverse().map(u => `
                     <div class="p-2.5 rounded-xl bg-white/10 border border-white/10 flex items-center justify-between text-xs backdrop-blur-xs">
                       <div class="min-w-0 pr-2">

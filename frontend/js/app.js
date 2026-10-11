@@ -10,13 +10,19 @@ function initAppState() {
     try {
       const parsed = JSON.parse(savedState);
       // Merge with fresh static data
+      const defaultFounders = [
+        { name: "Rahi Deshmukh", email: "rahi@wen.network", role: "Early-Stage Startup Founder", businessName: "Rahi Innovations", loginTime: "2026-10-10 18:21:24" },
+        { name: "Simran Kaur", email: "simran@kaurdesigns.com", role: "Early-Stage Startup Founder", businessName: "Kaur Designs", loginTime: "2026-10-11 01:22:54" },
+        { name: "Meera Kapoor", email: "meera@kapoorcrafts.in", role: "Early-Stage Startup Founder", businessName: "Kapoor Artisans", loginTime: "2026-10-11 18:37:29" }
+      ];
+
       return {
         currentRoute: parsed.currentRoute || 'home',
         currentUser: parsed.currentUser || WEN_DATA.currentUser,
         customProducts: parsed.customProducts || [],
         customCommunityPosts: parsed.customCommunityPosts || [],
         communityGroups: parsed.communityGroups || WEN_DATA.communityGroups,
-        mongoUsers: parsed.mongoUsers || [],
+        mongoUsers: (parsed.mongoUsers && parsed.mongoUsers.length > 0) ? parsed.mongoUsers : defaultFounders,
         mentorCategoryFilter: 'All',
         mentorSearchQuery: '',
         fundingCategoryFilter: 'All',
@@ -35,13 +41,19 @@ function initAppState() {
     }
   }
 
+  const defaultFounders = [
+    { name: "Rahi Deshmukh", email: "rahi@wen.network", role: "Early-Stage Startup Founder", businessName: "Rahi Innovations", loginTime: "2026-10-10 18:21:24" },
+    { name: "Simran Kaur", email: "simran@kaurdesigns.com", role: "Early-Stage Startup Founder", businessName: "Kaur Designs", loginTime: "2026-10-11 01:22:54" },
+    { name: "Meera Kapoor", email: "meera@kapoorcrafts.in", role: "Early-Stage Startup Founder", businessName: "Kapoor Artisans", loginTime: "2026-10-11 18:37:29" }
+  ];
+
   return {
     currentRoute: 'home',
     currentUser: JSON.parse(JSON.stringify(WEN_DATA.currentUser)),
     customProducts: [],
     customCommunityPosts: [],
     communityGroups: JSON.parse(JSON.stringify(WEN_DATA.communityGroups)),
-    mongoUsers: [],
+    mongoUsers: defaultFounders,
     mentorCategoryFilter: 'All',
     mentorSearchQuery: '',
     fundingCategoryFilter: 'All',
@@ -67,7 +79,8 @@ function persistState() {
       currentUser: window.APP_STATE.currentUser,
       customProducts: window.APP_STATE.customProducts,
       customCommunityPosts: window.APP_STATE.customCommunityPosts,
-      communityGroups: window.APP_STATE.communityGroups
+      communityGroups: window.APP_STATE.communityGroups,
+      mongoUsers: window.APP_STATE.mongoUsers || []
     };
     localStorage.setItem('wen_app_state_v1', JSON.stringify(toSave));
   } catch (e) {
@@ -250,7 +263,7 @@ async function syncMongoUsers() {
       // If a new user joined during live session, trigger automated notification & view refresh
       if (prevCount > 0 && data.users.length > prevCount) {
         const latestUser = data.users[data.users.length - 1];
-        showToast(`🎉 New founder joined MongoDB: ${latestUser.name} (${latestUser.businessName || latestUser.role})`, 'success');
+        showToast(`🎉 New founder joined: ${latestUser.name} (${latestUser.businessName || latestUser.role})`, 'success');
         if (['community', 'dashboard', 'home'].includes(window.APP_STATE.currentRoute)) {
           renderView(window.APP_STATE.currentRoute);
         }

@@ -1,5 +1,11 @@
 {
+  "name": "women-entrepreneur-network",
+  "version": "1.0.0",
+  "description": "Women Entrepreneur Network (WEN) with MongoDB",
+  "scripts": {
+    "mongo:setup": "node db/setup_mongodb.js"
+  },
   "dependencies": {
-    "mysql2": "^3.24.5"
+    "mongodb": "^6.5.0"
   }
 }
